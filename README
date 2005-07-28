@@ -1,0 +1,39 @@
+NAME
+    Catalyst::Plugin::OrderedParams - Maintain order of submitted form
+    parameters
+
+SYNOPSIS
+        use Catalyst 'OrderedParams';
+
+DESCRIPTION
+    This plugin enables handling of GET and POST parameters in an ordered
+    fashion. By default in Catalyst, form parameters are stored in a simple
+    hash, which loses the original order in which the paramters were
+    submitted. This plugin stores parameters in a Tie::IxHash which will
+    retain the original submitted order.
+
+    One particular application for this plugin is email handlers, where you
+    want the output of your email to reflect the order of form elements in
+    the form.
+
+    Simply add this plugin to your application and the following code will
+    be in the proper order.
+
+        for my $param ( $c->req->param ) {
+            $email .= $param . ": " . $c->req->param( $param );
+        }
+
+  METHODS
+    prepare_request (extended)
+        Replace the parameters hash in Catalyst::Request with a tied hash.
+
+SEE ALSO
+    Catalyst
+
+AUTHOR
+    Andy Grundman, "andy@hybridized.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
