@@ -1,4 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::OrderedParams
 
-0.01    2005-
+0.02    xxxx
+        - added note about this behavior not being RFC-compliant
+          (Tom Shinnick)
+
+0.01    2005-07-28 18:20:00
         - initial release

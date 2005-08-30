@@ -4,7 +4,7 @@ use strict;
 use NEXT;
 use Tie::IxHash;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ Catalyst::Plugin::OrderedParams - Maintain order of submitted form parameters
 
 This plugin enables handling of GET and POST parameters in an ordered fashion.
 By default in Catalyst, form parameters are stored in a simple hash, which
-loses the original order in which the paramters were submitted.  This plugin
+loses the original order in which the parameters were submitted.  This plugin
 stores parameters in a Tie::IxHash which will retain the original submitted
 order.
 
@@ -60,6 +60,13 @@ sub prepare_request {
 
 =back
 
+=head1 CAVEATS
+
+Note that technically according to RFC2388, the ordering of fields submitted
+by a form does not have to follow the order of the form elements displayed
+on the page.  However, I believe most, if not all, common browsers do follow
+this convention.  This plugin has been tested with both IE6 and Firefox 1.0.6.
+
 =head1 SEE ALSO
 
 L<Catalyst>
@@ -67,6 +74,10 @@ L<Catalyst>
 =head1 AUTHOR
 
 Andy Grundman, C<andy@hybridized.org>
+
+=head1 THANKS
+
+Tom Shinnick, C<shenme@perlmonks.org>, for pointing out RFC2388.
 
 =head1 COPYRIGHT
 
