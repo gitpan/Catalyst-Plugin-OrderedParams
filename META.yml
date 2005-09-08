@@ -1,8 +1,8 @@
 ---
 name: Catalyst-Plugin-OrderedParams
-version: 0.02
+version: 0.03
 author:
-  - 'Andy Grundman, C<andy@hybridized.org>'
+  - 'Andy Grundman, <andy@hybridized.org>'
 abstract: Maintain order of submitted form parameters
 license: perl
 requires:
@@ -11,5 +11,5 @@ requires:
 provides:
   Catalyst::Plugin::OrderedParams:
     file: lib/Catalyst/Plugin/OrderedParams.pm
-    version: 0.02
+    version: 0.03
 generated_by: Module::Build version 0.2611

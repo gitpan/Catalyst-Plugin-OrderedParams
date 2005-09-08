@@ -4,7 +4,29 @@ use strict;
 use NEXT;
 use Tie::IxHash;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+
+sub prepare_request {
+    my $c = shift;
+    
+    # make sure the params hash hasn't already been touched by another plugin
+    if ( scalar keys %{ $c->req->parameters } ) {
+        $c->log->error( "OrderedParams: Request parameters have already been "
+            . "set/modified.  Please load the OrderedParams plugin "
+            . "before all other plugins." );
+    }
+    else {
+        my $params = {};
+        tie %{$params}, 'Tie::IxHash';
+        
+        $c->req->parameters( $params );
+    }
+
+    return $c->NEXT::prepare_request(@_);
+}
+
+1;
+__END__
 
 =head1 NAME
 
@@ -12,7 +34,8 @@ Catalyst::Plugin::OrderedParams - Maintain order of submitted form parameters
 
 =head1 SYNOPSIS
 
-    use Catalyst 'OrderedParams';
+    use Catalyst;
+    MyApp->setup( qw/OrderedParams/ );
 
 =head1 DESCRIPTION
 
@@ -32,34 +55,6 @@ the proper order.
         $email .= $param . ": " . $c->req->param( $param );
     }
 
-=head2 METHODS
-
-=over 4
-
-=item prepare_request (extended)
-
-Replace the parameters hash in Catalyst::Request with a tied hash.
-
-=cut
-
-sub prepare_request {
-    my $c = shift;
-    
-    # make sure the params hash hasn't already been touched by another plugin
-    if ( scalar keys %{ $c->req->parameters } ) {
-        die "OrderedParams: Request parameters have already been set/modified. Please load the OrderedParams plugin before all other plugins.";
-    }
-    
-    my $parameters = {};
-    tie %$parameters, 'Tie::IxHash';
-    
-    $c->req->parameters( $parameters );
-
-    return $c->NEXT::prepare_request(@_);
-}
-
-=back
-
 =head1 CAVEATS
 
 Note that technically according to RFC2388, the ordering of fields submitted
@@ -73,7 +68,7 @@ L<Catalyst>
 
 =head1 AUTHOR
 
-Andy Grundman, C<andy@hybridized.org>
+Andy Grundman, <andy@hybridized.org>
 
 =head1 THANKS
 
@@ -85,5 +80,3 @@ This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
-
-1;

@@ -3,12 +3,13 @@ NAME
     parameters
 
 SYNOPSIS
-        use Catalyst 'OrderedParams';
+        use Catalyst;
+        MyApp->setup( qw/OrderedParams/ );
 
 DESCRIPTION
     This plugin enables handling of GET and POST parameters in an ordered
     fashion. By default in Catalyst, form parameters are stored in a simple
-    hash, which loses the original order in which the paramters were
+    hash, which loses the original order in which the parameters were
     submitted. This plugin stores parameters in a Tie::IxHash which will
     retain the original submitted order.
 
@@ -23,10 +24,6 @@ DESCRIPTION
             $email .= $param . ": " . $c->req->param( $param );
         }
 
-  METHODS
-    prepare_request (extended)
-        Replace the parameters hash in Catalyst::Request with a tied hash.
-
 CAVEATS
     Note that technically according to RFC2388, the ordering of fields
     submitted by a form does not have to follow the order of the form
@@ -38,7 +35,7 @@ SEE ALSO
     Catalyst
 
 AUTHOR
-    Andy Grundman, "andy@hybridized.org"
+    Andy Grundman, <andy@hybridized.org>
 
 THANKS
     Tom Shinnick, "shenme@perlmonks.org", for pointing out RFC2388.
