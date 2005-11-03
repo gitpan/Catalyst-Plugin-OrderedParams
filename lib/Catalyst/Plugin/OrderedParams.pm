@@ -2,27 +2,79 @@ package Catalyst::Plugin::OrderedParams;
 
 use strict;
 use NEXT;
-use Tie::IxHash;
+use Tie::Hash::Indexed;
 
-our $VERSION = '0.03';
+if ( Catalyst->VERSION ge '5.49' ) {
+    require HTTP::Body;
+}
+
+our $VERSION = '0.04';
 
 sub prepare_request {
     my $c = shift;
     
     # make sure the params hash hasn't already been touched by another plugin
-    if ( scalar keys %{ $c->req->parameters } ) {
+    if ( scalar keys %{ $c->req->{parameters} } ) {
         $c->log->error( "OrderedParams: Request parameters have already been "
             . "set/modified.  Please load the OrderedParams plugin "
             . "before all other plugins." );
     }
     else {
         my $params = {};
-        tie %{$params}, 'Tie::IxHash';
-        
-        $c->req->parameters( $params );
+        tie %{$params}, 'Tie::Hash::Indexed';
+        $c->req->{parameters} = $params;
+
+        if ( Catalyst->VERSION ge '5.49' ) {
+            my $query_params = {};
+            tie %{$query_params}, 'Tie::Hash::Indexed';
+            $c->req->{query_parameters} = $query_params;
+        }
     }
 
     return $c->NEXT::prepare_request(@_);
+}
+
+sub prepare_body {
+    my $c = shift;
+    
+    return $c->NEXT::prepare_body(@_) if Catalyst->VERSION lt '5.49';
+    
+    # due to complex interactions in 5.5 this method has to be overridden
+    # instead of extended.
+
+    # have we already built the object?
+    return if defined $c->request->{_body}->{ordered};
+
+    # for 5.5+, we create a new HTTP::Body instance with indexed hashes.
+    my $length = $c->req->header('Content-Length') || 0;
+    my $type   = $c->req->header('Content-Type');
+    my $body   = HTTP::Body->new( $type, $length );
+    
+    tie %{ $body->{param}  }, 'Tie::Hash::Indexed';
+    tie %{ $body->{upload} }, 'Tie::Hash::Indexed';
+    $body->{ordered} = 1;
+   
+    $c->req->{_body} = $body;
+
+    # Initialize on-demand data
+    $c->engine->prepare_body( $c, @_ );
+    $c->prepare_parameters;
+    $c->prepare_uploads;
+
+    if ( $c->debug && keys %{ $c->req->body_parameters } ) {
+        my $t = Text::ASCIITable->new;
+        $t->setCols( 'Key', 'Value' );
+        $t->setColWidth( 'Key',   37, 1 );
+        $t->setColWidth( 'Value', 36, 1 );
+        $t->alignCol( 'Value', 'right' );
+        for my $key ( sort keys %{ $c->req->body_parameters } ) {
+            my $param = $c->req->body_parameters->{$key};
+            my $value = defined($param) ? $param : '';
+            $t->addRow( $key,
+                ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
+        }
+        $c->log->debug( "Body Parameters are:\n" . $t->draw );
+    }    
 }
 
 1;

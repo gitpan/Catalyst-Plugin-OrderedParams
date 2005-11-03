@@ -6,8 +6,8 @@ my $build = Module::Build->new(
     license            => 'perl',
     module_name        => 'Catalyst::Plugin::OrderedParams',
     requires           => { 
-        'Catalyst'     => '5.30',
-        'Tie::IxHash'  => 0,
+        'Catalyst'              => '5.30',
+        'Tie::Hash::Indexed'    => 0,
     },
     create_makefile_pl => 'passthrough',
     test_files   => [

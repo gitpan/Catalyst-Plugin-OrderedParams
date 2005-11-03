@@ -9,12 +9,12 @@ use lib "$FindBin::Bin/lib";
 use Test::More tests => 7;
 use Catalyst::Test 'TestApp';
 use HTTP::Request::Common;
-use Tie::IxHash;
+use Tie::Hash::Indexed;
 
 my $creq;
 
 my %params;
-tie %params, 'Tie::IxHash';
+tie %params, 'Tie::Hash::Indexed';
 
 my @params = qw/a b c d e f g/;
 %params = map { $_ => 1 } @params;
