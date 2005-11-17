@@ -8,7 +8,7 @@ if ( Catalyst->VERSION ge '5.49' ) {
     require HTTP::Body;
 }
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub prepare_request {
     my $c = shift;
@@ -62,15 +62,11 @@ sub prepare_body {
     $c->prepare_uploads;
 
     if ( $c->debug && keys %{ $c->req->body_parameters } ) {
-        my $t = Text::ASCIITable->new;
-        $t->setCols( 'Key', 'Value' );
-        $t->setColWidth( 'Key',   37, 1 );
-        $t->setColWidth( 'Value', 36, 1 );
-        $t->alignCol( 'Value', 'right' );
+        my $t = Text::SimpleTable->new( [ 37, 'Key' ], [ 36, 'Value' ] );
         for my $key ( sort keys %{ $c->req->body_parameters } ) {
             my $param = $c->req->body_parameters->{$key};
             my $value = defined($param) ? $param : '';
-            $t->addRow( $key,
+            $t->row( $key,
                 ref $value eq 'ARRAY' ? ( join ', ', @$value ) : $value );
         }
         $c->log->debug( "Body Parameters are:\n" . $t->draw );
