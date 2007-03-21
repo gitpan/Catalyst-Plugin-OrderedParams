@@ -8,7 +8,7 @@ if ( Catalyst->VERSION ge '5.49' ) {
     require HTTP::Body;
 }
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub prepare_request {
     my $c = shift;
@@ -41,9 +41,14 @@ sub prepare_body {
     
     # due to complex interactions in 5.5 this method has to be overridden
     # instead of extended.
+    
+    if ( defined $c->request->{_body} ) {
+        # We may not have a body to process if it was a GET request
+        return if !ref $c->request->{_body};
 
-    # have we already built the object?
-    return if defined $c->request->{_body}->{ordered};
+        # have we already built the object?
+        return if defined $c->request->{_body}->{ordered};
+    }
 
     # for 5.5+, we create a new HTTP::Body instance with indexed hashes.
     my $length = $c->req->header('Content-Length') || 0;

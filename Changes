@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::OrderedParams
 
+0.06    2007-03-20 23:25:00
+        - Fixed compatibility with Catalyst 5.7007.
+
 0.05    2005-11-17 12:00:00
         - Replaced Text::ASCIITable with Text::SimpleTable.
         - Fixed 01use.t.
